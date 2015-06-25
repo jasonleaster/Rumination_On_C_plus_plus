@@ -194,7 +194,8 @@ template<class T> class Ptr_to_const
         unsigned sub;
 };
 
-template<class T> class Pointer: public Ptr_to_const<T>
+template<class T>
+class Pointer: public Ptr_to_const<T>
 {
     public:
         Pointer(Array<T>& a, unsigned n = 0):
@@ -218,7 +219,7 @@ template<class T> class Pointer: public Ptr_to_const<T>
             }
         }
 
-        Pointer& operator=(const Pointer<T>& p)
+        Pointer<T>& operator=(const Pointer<T>& p)
         {
             if(p.ap)
             {
@@ -245,39 +246,39 @@ template<class T> class Pointer: public Ptr_to_const<T>
             return (*ap)[sub];
         }
 
-        Pointer& operator++()
+        Pointer<T>& operator++()
         {
             ++sub;
             return *this;
         }
 
-        Pointer& operator--()
+        Pointer<T>& operator--()
         {
             --sub;
             return *this;
         }
 
-        Pointer& operator++(int)
+        Pointer<T>& operator++(int)
         {
-            Pointer ret = *this;
+            Pointer<T> ret = *this;
             ++sub;
             return ret;
         }
 
-        Pointer& operator--(int)
+        Pointer<T>& operator--(int)
         {
-            Pointer ret = *this;
+            Pointer<T> ret = *this;
             --sub;
             return ret;
         }
 
-        Pointer& operator +=(int n)
+        Pointer<T>& operator +=(int n)
         {
             sub += n;
             return *this;
         }
 
-        Pointer& operator -=(int n)
+        Pointer<T>& operator -=(int n)
         {
             sub -= n;
             return *this;

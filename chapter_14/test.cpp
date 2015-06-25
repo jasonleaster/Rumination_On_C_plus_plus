@@ -11,5 +11,10 @@ int main()
 
     cout << *ap << endl;
 
+    cout << *p << endl;
+
+    p++;
+    cout << *p << endl;
+
     return 0;
 }

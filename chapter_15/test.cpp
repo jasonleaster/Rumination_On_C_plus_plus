@@ -13,5 +13,11 @@ int main()
 
     cout << s << endl;
 
+    s.flip();
+    cout << s << endl;
+
+ //   s = merge(s, s);
+    cout << s.tl() << endl;
+
     return 0;
 }

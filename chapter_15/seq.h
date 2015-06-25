@@ -4,6 +4,13 @@ File        :   seq.h
 Date        :   2015.05.26
 E-mail      :   jasonleaster@gmail.com
 
+WARNING!!
+
+I give up to fix this program up.
+It's totally shit.
+
+I decide to rewrite it.
+
 *****************************************************/
 #ifndef _SEQ_H
 #define _SEQ_H
@@ -32,19 +39,29 @@ class Seq
         Seq():item(0), len(0) { }
         Seq(const T& t);
         Seq(const T& t, const Seq& x);
-        Seq(const Seq&);
+        Seq(Seq&);
         Seq(Seq_item<T>* s, unsigned l);
 
         ~Seq();
 
+        /*
+            @hd() : return the first element in @Seq object which 
+                    have one element at least.
+
+            @tl() : create and return a @Seq object which copy from 
+                    the object which call this function. And the first
+                    element in the old object will not be copyed into
+                    the new object which will be returned by @tl().
+         */
         T   hd() const;
         Seq tl() const;
 
         int length() const;
-
         void destroy(Seq_item<T>* item);
+
         Seq<T>& flip();
         Seq<T>& insert(const T& t);
+
         Seq_item<T>* owntail();
 
 
@@ -85,13 +102,25 @@ Seq<T>::~Seq()
 
 template<class T>
 Seq<T>::Seq(const T& t):
-    item(new Seq_item<T>(t, NULL))
+    item(new Seq_item<T>(t, NULL)), len(1)
 {
 }
 
 template<class T>
+Seq<T>::Seq(Seq& s):
+    item(s.item), len(s.len)
+{
+    Seq_item<T>* it = s.item;
+
+    for(int i = 0; i < len; i++, it = it->next)
+    {
+        (it.use)++;
+    }
+}
+
+template<class T>
 Seq<T>::Seq(const T& t, const Seq& x):
-    item(new Seq_item<T>(t, x.item)) 
+    item(new Seq_item<T>(t, x.item)), len(x.len + 1)
 { 
 }
 
@@ -104,7 +133,6 @@ Seq<T>::Seq(Seq_item<T>* s, unsigned l):
         s->use++;
     }
 }
-
 
 template<class T>
 T 
@@ -124,10 +152,11 @@ template<class T>
 void 
 Seq<T>::destroy(Seq_item<T>* item)
 {
-    while(item && --item->use == 0)
+    while(item && (--(item->use)) == 0)
     {
         Seq_item<T>* next = item->next;
         delete item;
+        --(this->len);
         item = next;
     }
 }
@@ -152,8 +181,6 @@ Seq<T>::tl() const
         throw "tl of an empty Seq";
     }
 }
-
-
 
 
 template<class T>
@@ -181,35 +208,6 @@ Seq_item<T>::Seq_item(const T& t, Seq_item<T>* s):
     }
 }
 
-template<class T> 
-Seq<T> cons(const T& t, const Seq<T>& s)
-{
-    return Seq<T>(t, s);
-}
-
-template<class T>
-int length(const Seq<T>& s)
-{
-    if(s)
-    {
-        return (1 + length(s.tl()));
-    }
-
-    return 0;
-}
-
-template<class T>
-int length(Seq<T> s)
-{
-    int n = 0;
-    while(s)
-    {
-        s = s.tl();
-        n++;
-    }
-
-    return n;
-}
 
 template<class T>
 Seq<T>& 
@@ -252,17 +250,21 @@ Seq<T>::operator++(int)
 
     return ret;
 }
+
 template<class T>
 Seq<T>& 
 Seq<T>::operator = (const Seq<T>& s)
 {
-    if(s.item)
+    Seq_item<T>* it = s.item;
+
+    while(it)
     {
-        s.item->use++;
+        it->use++;
     }
 
-    destory(item);
+    destroy(item);
     item = s.item;
+    len  = s.len;
     return *this;
 }
 
@@ -330,7 +332,7 @@ Seq<T>::flip()
     {
         Seq_item<T>* k = owntail();
         Seq_item<T>* curr = item;
-        Seq_item<T>* behind = 0;
+        Seq_item<T>* behind = NULL;
 
         do
         {
@@ -452,6 +454,12 @@ bool operator == (const Seq<T>& op1, const Seq<T>& op2)
     }
 
     return true;
+}
+
+template<class T> 
+Seq<T> cons(const T& t, const Seq<T>& s)
+{
+    return Seq<T>(t, s);
 }
 
 #endif
